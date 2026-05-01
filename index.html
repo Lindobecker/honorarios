@@ -1,3 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LB Contabilidade</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI';
+    background: linear-gradient(135deg, #0a2540, #1e3c72);
+}
+
+.container {
+    max-width: 420px;
+    margin: auto;
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+}
+
+.header img {
+    width: 120px;
+    border-radius: 50%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.header h1 {
+    color: #fff;
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+.card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 15px;
+    margin-top: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    background: linear-gradient(90deg, #c9a74e, #f4d03f);
+    color: #0a2540;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.result {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f4f6fb;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.valor {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1e3c72;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<img src="logo.jpg">
+<h1>LB Contabilidade</h1>
+</div>
+
+<div class="card">
+
+<input type="text" id="cliente" placeholder="Nome do cliente">
+
+<select id="regime">
+<option>Simples Nacional</option>
+<option>Presumido</option>
+<option>Real</option>
+</select>
+
+<select id="atividade">
+<option>Servico</option>
+<option>Comercio</option>
+<option>Industria</option>
+</select>
+
+<input type="number" id="faturamento" placeholder="Faturamento anual">
+<input type="number" id="func" placeholder="Funcionários">
+
+<button onclick="calcular()">Calcular</button>
+<button onclick="gerarPDF()">Gerar Proposta PDF</button>
+
+<div id="resultado" class="result"></div>
+
+</div>
+</div>
+
+<script>
+
+const tabela = [
+
+    // SIMPLES
+    {regime:"Simples Nacional", min:0, max:90000, valores:[400,550,625]},
+    {regime:"Simples Nacional", min:90001, max:180000, valores:[800,1100,1250]},
+    {regime:"Simples Nacional", min:180000.01, max:360000, valores:[1200,1850,2100]},
+    {regime:"Simples Nacional", min:360000.01, max:720000, valores:[2250,2450,2650]},
+    {regime:"Simples Nacional", min:720000.01, max:1800000, valores:[3250,3505,3625]},
+    {regime:"Simples Nacional", min:1800000.01, max:3600000, valores:[4680,4985,5245]},
+    {regime:"Simples Nacional", min:3600000.01, max:4800000, valores:[5850,6450,6875]},
+
+    // PRESUMIDO
+    {regime:"Presumido", min:0, max:180000, valores:[950,1220,1320]},
+    {regime:"Presumido", min:180000.01, max:360000, valores:[2120,2320,2485]},
+    {regime:"Presumido", min:360000.01, max:720000, valores:[4395,4645,4765]},
+    {regime:"Presumido", min:720000.01, max:1800000, valores:[5205,5450,5500]},
+    {regime:"Presumido", min:1800000.01, max:3600000, valores:[6285,6530,6685]},
+    {regime:"Presumido", min:3600000.01, max:4800000, valores:[8450,8710,8830]},
+
+    // REAL
+    {regime:"Real", min:0, max:180000, valores:[1650,1880,2000]},
+    {regime:"Real", min:180000.01, max:360000, valores:[3200,3420,3625]},
+    {regime:"Real", min:360000.01, max:720000, valores:[3950,4210,4420]},
+    {regime:"Real", min:720000.01, max:1800000, valores:[6200,6450,6850]},
+    {regime:"Real", min:1800000.01, max:3600000, valores:[9100,10120,10295]},
+    {regime:"Real", min:3600000.01, max:4800000, valores:[13120,13350,13450]}
+
+];
+
+let dados = {};
+
+function formatarMoeda(valor){
+return valor.toLocaleString('pt-BR', {
+style: 'currency',
+currency: 'BRL'
+});
+}
+
+function calcular(){
+let regime = document.getElementById("regime").value;
+let atividade = document.getElementById("atividade").selectedIndex;
+let fat = parseFloat(document.getElementById("faturamento").value);
+let func = parseInt(document.getElementById("func").value)||0;
+
+let base = 0;
+
+tabela.forEach(l=>{
+if(l.regime===regime && fat>=l.min && fat<=l.max){
+base = l.valores[atividade];
+}
+});
+
+let total = base + (func * 50);
+
+document.getElementById("resultado").innerHTML =
+`<div>Honorário Base</div>
+<div class="valor">R$ ${base}</div>
+<br>
+<div>Total</div>
+<div class="valor">R$ ${total}</div>`;
+
+dados = {regime, fat, func, base, total};
+}
+
 async function gerarPDF(){
 
 const { jsPDF } = window.jspdf;
@@ -5,83 +190,35 @@ const doc = new jsPDF();
 
 let cliente = document.getElementById("cliente").value || "Cliente";
 
-// CORES
-const azul = [10, 37, 64];
-const dourado = [201, 167, 78];
-
-// LOGO
 const img = new Image();
 img.src = "logo.jpg";
 
 img.onload = function(){
 
-// HEADER
-doc.setFillColor(...azul);
-doc.rect(0, 0, 210, 40, 'F');
+doc.addImage(img, "JPEG", 80, 10, 50, 50);
 
-// LOGO
-doc.addImage(img, "JPEG", 85, 5, 40, 30);
+doc.setFontSize(16);
+doc.text("PROPOSTA DE HONORÁRIOS", 20, 80);
 
-// TÍTULO
-doc.setTextColor(255,255,255);
-doc.setFontSize(14);
-doc.text("PROPOSTA DE HONORÁRIOS", 105, 35, null, null, "center");
-
-// RESET COR
-doc.setTextColor(0,0,0);
-
-// CLIENTE
 doc.setFontSize(12);
-doc.text("Cliente:", 20, 60);
-doc.setFont("helvetica", "bold");
-doc.text(cliente, 50, 60);
+doc.text("Cliente: " + cliente, 20, 100);
 
-// LINHA
-doc.setDrawColor(...dourado);
-doc.line(20, 65, 190, 65);
+doc.text("Regime: " + dados.regime, 20, 110);
+doc.text("Faturamento: " + formatarMoeda(dados.fat), 20, 120);
+doc.text("Funcionários: " + dados.func, 20, 130);
 
-// DADOS
-doc.setFont("helvetica", "normal");
+doc.text("Honorário Base: " + formatarMoeda(dados.base), 20, 150);
+doc.text("Honorário Final: " + formatarMoeda(dados.total), 20, 160);
 
-doc.text("Regime:", 20, 80);
-doc.text(dados.regime, 80, 80);
+doc.text("LB Contabilidade", 20, 190);
 
-doc.text("Faturamento:", 20, 90);
-doc.text(formatarMoeda(dados.fat), 80, 90);
-
-doc.text("Funcionários:", 20, 100);
-doc.text(String(dados.func), 80, 100);
-
-// CAIXA
-doc.setFillColor(245, 247, 252);
-doc.roundedRect(20, 120, 170, 40, 5, 5, 'F');
-
-// TEXTO
-doc.setFontSize(12);
-doc.text("Honorário Mensal", 105, 135, null, null, "center");
-
-// VALOR
-doc.setFontSize(20);
-doc.setTextColor(...azul);
-doc.text(formatarMoeda(dados.total), 105, 150, null, null, "center");
-
-// RESET COR
-doc.setTextColor(0,0,0);
-
-// OBS
-doc.setFontSize(10);
-doc.text("Proposta válida por 10 dias.", 20, 180);
-
-// RODAPÉ
-doc.setDrawColor(...dourado);
-doc.line(20, 190, 190, 190);
-
-doc.setFontSize(10);
-doc.text("LB Contabilidade", 105, 200, null, null, "center");
-
-// SALVAR
 doc.save("Proposta_"+cliente+".pdf");
 
 };
 
 }
+
+</script>
+
+</body>
+</html>
