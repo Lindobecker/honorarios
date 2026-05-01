@@ -190,17 +190,9 @@ const doc = new jsPDF();
 
 let cliente = document.getElementById("cliente").value || "Cliente";
 
-// CORES
+// CORES DA MARCA
 const azul = [10, 37, 64];
 const dourado = [201, 167, 78];
-
-// FUNÇÃO FORMATAÇÃO
-function formatarMoeda(valor){
-return valor.toLocaleString('pt-BR', {
-style: 'currency',
-currency: 'BRL'
-});
-}
 
 // LOGO
 const img = new Image();
@@ -208,11 +200,11 @@ img.src = "logo.jpg";
 
 img.onload = function(){
 
-// HEADER FUNDO
+// FUNDO HEADER
 doc.setFillColor(...azul);
 doc.rect(0, 0, 210, 40, 'F');
 
-// LOGO
+// LOGO CENTRAL
 doc.addImage(img, "JPEG", 85, 5, 40, 30);
 
 // TÍTULO
@@ -220,7 +212,7 @@ doc.setTextColor(255,255,255);
 doc.setFontSize(14);
 doc.text("PROPOSTA DE HONORÁRIOS", 105, 35, null, null, "center");
 
-// VOLTA COR
+// RESET COR
 doc.setTextColor(0,0,0);
 
 // CLIENTE
@@ -229,7 +221,7 @@ doc.text("Cliente:", 20, 60);
 doc.setFont("helvetica", "bold");
 doc.text(cliente, 50, 60);
 
-// LINHA
+// LINHA DOURADA
 doc.setDrawColor(...dourado);
 doc.line(20, 65, 190, 65);
 
@@ -249,7 +241,7 @@ doc.text(String(dados.func), 80, 100);
 doc.setFillColor(245, 247, 252);
 doc.roundedRect(20, 120, 170, 40, 5, 5, 'F');
 
-// TEXTO VALOR
+// TEXTO
 doc.setFontSize(12);
 doc.text("Honorário Mensal", 105, 135, null, null, "center");
 
@@ -261,7 +253,7 @@ doc.text(formatarMoeda(dados.total), 105, 150, null, null, "center");
 // RESET COR
 doc.setTextColor(0,0,0);
 
-// OBSERVAÇÃO
+// OBS
 doc.setFontSize(10);
 doc.text("Proposta válida por 10 dias.", 20, 180);
 
@@ -278,6 +270,7 @@ doc.save("Proposta_"+cliente+".pdf");
 };
 
 }
+
 </script>
 
 </body>
