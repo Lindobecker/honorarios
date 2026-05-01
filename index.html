@@ -6,14 +6,13 @@
 
 <title>Honorários Contábeis</title>
 
-<!-- Biblioteca PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body {
     margin: 0;
     font-family: 'Segoe UI';
-    background: linear-gradient(135deg, #1f3c88, #39a0ed);
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
 }
 
 .container {
@@ -22,21 +21,35 @@ body {
     padding: 20px;
 }
 
+.header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.header img {
+    max-width: 120px;
+    margin-bottom: 10px;
+}
+
+.header h1 {
+    color: white;
+    font-size: 20px;
+    margin: 0;
+}
+
 .card {
     background: white;
     padding: 25px;
     border-radius: 15px;
-}
-
-h1 {
-    text-align: center;
-    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 input, select {
     width: 100%;
     padding: 12px;
     margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
 }
 
 button {
@@ -44,10 +57,11 @@ button {
     padding: 12px;
     margin-top: 10px;
     border: none;
-    background: #1f3c88;
+    background: #2c5364;
     color: white;
     font-weight: bold;
     border-radius: 8px;
+    cursor: pointer;
 }
 
 .result {
@@ -55,6 +69,7 @@ button {
     padding: 15px;
     background: #f1f5ff;
     border-radius: 10px;
+    text-align: center;
 }
 </style>
 </head>
@@ -62,7 +77,11 @@ button {
 <body>
 
 <div class="container">
-<h1>Honorários</h1>
+
+<div class="header">
+<img src="logo.png">
+<h1>Honorários Contábeis</h1>
+</div>
 
 <div class="card">
 
@@ -93,7 +112,6 @@ button {
 </div>
 
 <script>
-
 const tabela = [
 {regime:"Simples Nacional",min:0,max:180000,valores:[800,1100,1250]},
 {regime:"Simples Nacional",min:180000,max:360000,valores:[1200,1850,2100]},
@@ -117,7 +135,7 @@ const tabela = [
 {regime:"Real",min:3600000,max:4800000,valores:[13120,13350,13450]}
 ];
 
-let ultimoResultado = {};
+let ultimo = {};
 
 function calcular(){
 let regime = document.getElementById("regime").value;
@@ -137,9 +155,9 @@ base = l.valores[atividade];
 let total = base + (func*50) + (notas*1);
 
 document.getElementById("resultado").innerHTML =
-`Base: R$ ${base}<br>Total: R$ ${total}`;
+`<b>Base:</b> R$ ${base}<br><b>Total:</b> R$ ${total}`;
 
-ultimoResultado = {regime, fat, func, notas, base, total};
+ultimo = {regime, fat, func, base, total};
 }
 
 function gerarPDF(){
@@ -155,18 +173,17 @@ doc.text("PROPOSTA DE HONORÁRIOS", 20, 20);
 doc.setFontSize(12);
 doc.text("Cliente: " + cliente, 20, 40);
 
-doc.text("Regime: " + ultimoResultado.regime, 20, 50);
-doc.text("Faturamento: R$ " + ultimoResultado.fat, 20, 60);
-doc.text("Funcionários: " + ultimoResultado.func, 20, 70);
+doc.text("Regime: " + ultimo.regime, 20, 55);
+doc.text("Faturamento: R$ " + ultimo.fat, 20, 65);
+doc.text("Funcionários: " + ultimo.func, 20, 75);
 
-doc.text("Honorário Base: R$ " + ultimoResultado.base, 20, 90);
-doc.text("Honorário Final: R$ " + ultimoResultado.total, 20, 100);
+doc.text("Honorário Base: R$ " + ultimo.base, 20, 95);
+doc.text("Honorário Final: R$ " + ultimo.total, 20, 105);
 
 doc.text("Proposta válida por 10 dias.", 20, 130);
 
-doc.save("proposta.pdf");
+doc.save("Proposta_"+cliente+".pdf");
 }
-
 </script>
 
 </body>
