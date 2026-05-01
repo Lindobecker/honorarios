@@ -174,11 +174,8 @@ base = l.valores[atividade];
 let total = base + (func * 50);
 
 document.getElementById("resultado").innerHTML =
-`<div>Honorário Base</div>
-<div class="valor">R$ ${base}</div>
-<br>
-<div>Total</div>
-<div class="valor">R$ ${total}</div>`;
+`<div>Honorário Mensal</div>
+<div class="valor">${formatarMoeda(total)}</div>`;
 
 dados = {regime, fat, func, base, total};
 }
@@ -190,7 +187,7 @@ const doc = new jsPDF();
 
 let cliente = document.getElementById("cliente").value || "Cliente";
 
-// CORES DA MARCA
+// CORES
 const azul = [10, 37, 64];
 const dourado = [201, 167, 78];
 
@@ -200,11 +197,11 @@ img.src = "logo.jpg";
 
 img.onload = function(){
 
-// FUNDO HEADER
+// HEADER
 doc.setFillColor(...azul);
 doc.rect(0, 0, 210, 40, 'F');
 
-// LOGO CENTRAL
+// LOGO
 doc.addImage(img, "JPEG", 85, 5, 40, 30);
 
 // TÍTULO
@@ -221,7 +218,7 @@ doc.text("Cliente:", 20, 60);
 doc.setFont("helvetica", "bold");
 doc.text(cliente, 50, 60);
 
-// LINHA DOURADA
+// LINHA
 doc.setDrawColor(...dourado);
 doc.line(20, 65, 190, 65);
 
@@ -237,7 +234,7 @@ doc.text(formatarMoeda(dados.fat), 80, 90);
 doc.text("Funcionários:", 20, 100);
 doc.text(String(dados.func), 80, 100);
 
-// CAIXA DE VALOR
+// CAIXA
 doc.setFillColor(245, 247, 252);
 doc.roundedRect(20, 120, 170, 40, 5, 5, 'F');
 
@@ -245,7 +242,7 @@ doc.roundedRect(20, 120, 170, 40, 5, 5, 'F');
 doc.setFontSize(12);
 doc.text("Honorário Mensal", 105, 135, null, null, "center");
 
-// VALOR GRANDE
+// VALOR
 doc.setFontSize(20);
 doc.setTextColor(...azul);
 doc.text(formatarMoeda(dados.total), 105, 150, null, null, "center");
