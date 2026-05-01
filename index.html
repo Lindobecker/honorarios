@@ -108,7 +108,6 @@ button {
 
 <input type="number" id="faturamento" placeholder="Faturamento anual">
 <input type="number" id="func" placeholder="Funcionários">
-<input type="number" id="notas" placeholder="Notas/mês">
 
 <button onclick="calcular()">Calcular</button>
 <button onclick="gerarPDF()">Gerar Proposta PDF</button>
@@ -151,6 +150,13 @@ const tabela = [
 
 let dados = {};
 
+function formatarMoeda(valor){
+return valor.toLocaleString('pt-BR', {
+style: 'currency',
+currency: 'BRL'
+});
+}
+
 function calcular(){
 let regime = document.getElementById("regime").value;
 let atividade = document.getElementById("atividade").selectedIndex;
@@ -166,7 +172,7 @@ base = l.valores[atividade];
 }
 });
 
-let total = base + (func*50) + (notas*1);
+let total = base + (func * 50);
 
 document.getElementById("resultado").innerHTML =
 `<div>Honorário Base</div>
@@ -199,11 +205,11 @@ doc.setFontSize(12);
 doc.text("Cliente: " + cliente, 20, 100);
 
 doc.text("Regime: " + dados.regime, 20, 110);
-doc.text("Faturamento: R$ " + dados.fat, 20, 120);
+doc.text("Faturamento: " + formatarMoeda(dados.fat), 20, 120);
 doc.text("Funcionários: " + dados.func, 20, 130);
 
-doc.text("Honorário Base: R$ " + dados.base, 20, 150);
-doc.text("Honorário Final: R$ " + dados.total, 20, 160);
+doc.text("Honorário Base: " + formatarMoeda(dados.base), 20, 150);
+doc.text("Honorário Final: " + formatarMoeda(dados.total), 20, 160);
 
 doc.text("LB Contabilidade", 20, 190);
 
