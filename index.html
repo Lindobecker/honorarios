@@ -161,27 +161,46 @@ currency: 'BRL'
 });
 }
 
-function calcular(){
-let regime = document.getElementById("regime").value;
-let atividade = document.getElementById("atividade").selectedIndex;
-let fat = parseFloat(document.getElementById("faturamento").value);
-let func = parseInt(document.getElementById("func").value)||0;
+function calcular() {
 
-let base = 0;
+    const regime = document.getElementById("regime").value;
+    const atividade = document.getElementById("atividade").selectedIndex;
+    const fat = Number(document.getElementById("faturamento").value);
+    const func = Number(document.getElementById("func").value) || 0;
 
-tabela.forEach(l=>{
-if(l.regime===regime && fat>=l.min && fat<=l.max){
-base = l.valores[atividade];
-}
-});
+    if (isNaN(fat) || fat < 0) {
+        alert("Informe um faturamento válido.");
+        return;
+    }
 
-let total = base + (func * 50);
+    const faixa = tabela.find(item =>
+        item.regime === regime &&
+        fat >= item.min &&
+        fat <= item.max
+    );
 
-document.getElementById("resultado").innerHTML =
-`<div>Honorário Mensal</div>
-<div class="valor">${formatarMoeda(total)}</div>`;
+    if (!faixa) {
+        document.getElementById("resultado").innerHTML =
+            "<b>Não existe faixa cadastrada para esse faturamento.</b>";
+        return;
+    }
 
-dados = {regime, fat, func, base, total};
+    const base = faixa.valores[atividade];
+    const total = base + (func * 50);
+
+    document.getElementById("resultado").innerHTML = `
+        <div>Honorário Mensal</div>
+        <div class="valor">${formatarMoeda(total)}</div>
+    `;
+
+    dados = {
+        regime,
+        atividade,
+        fat,
+        func,
+        base,
+        total
+    };
 }
 
 async function gerarPDF(){
